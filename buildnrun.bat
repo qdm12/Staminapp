@@ -1,0 +1,9 @@
+@echo off
+echo Launching...
+cd C:\Android\Staminapp && call gradlew.bat assembleDebug --stacktrace
+echo Installing...
+cd C:\Android\Staminapp\mobile\build\outputs\apk\ && adb install -rd mobile-debug.apk
+echo Launching...
+adb shell am start -n com.stamina.staminapp/.LoginActivity
+echo DONE !
+echo.

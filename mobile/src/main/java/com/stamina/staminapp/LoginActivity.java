@@ -28,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mIpView;
     private View mProgressView;
     private View mLoginFormView;
+    private boolean DEBUG = true;
 
 
 
@@ -69,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean isIpValid(String ip){
+        if (DEBUG){return true;}
         int dots = 0, pos = 0;
         String temp;
         for( int i=0; i<ip.length(); i++ ) {
@@ -166,7 +168,7 @@ public class LoginActivity extends AppCompatActivity {
     public class UserLoginTask extends AsyncTask<Void, Void, String> {
         private final String mEmail;
         private final String mPassword;
-        private Networking net = new Networking("192.168.1.1");
+        private Networking net = new Networking(null, "192.168.1.1");
 
         UserLoginTask(String email, String password, String ip) { //constructor
             mEmail = email;
@@ -177,7 +179,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... params) {
             try{
-                Thread.sleep(1000);
+                Thread.sleep(150);
             } catch (InterruptedException e){}
             String page = "login", response;
             Map<String, String> urlparameters = new HashMap<String, String>();
@@ -185,9 +187,9 @@ public class LoginActivity extends AppCompatActivity {
             urlparameters.put("password",mPassword);
             response = net.post(page, urlparameters);
             if (response == null){
+                if (DEBUG){return "auth_success";}
                 return "connection_fail";
-            }
-            else if (response.equals("true")) { //HERE
+            } else if (response.equals("true")) { //HERE
                 return "auth_success"; //then eventually propose to register
             }
             return "auth_fail";
@@ -201,6 +203,7 @@ public class LoginActivity extends AppCompatActivity {
                 String cookie = net.get_cookie();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.putExtra("cookie", cookie);
+                intent.putExtra("source", "LoginActivity");
                 startActivity(intent);
             } else if (result.equals("auth_fail")) {
                 mPasswordView.setError("Wrong email/password combination");

@@ -29,7 +29,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="Wake up event"
-            android:onClick="onClickupload"
+            android:onClick="onClickUpload"
             android:id="@+id/button_wakeup" />
 
         <Button
@@ -38,7 +38,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="Go to sleep event"
-            android:onClick="onClickupload"
+            android:onClick="onClickUpload"
             android:id="@+id/button_sleep" />
 
         <Button
@@ -46,8 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:text="Coffee event"
-            android:onClick="onClickupload"
+            android:text="Drinking movement"
+            android:onClick="onDrinkingMovement"
             android:id="@+id/button_coffee" />
 
         <Button
@@ -55,8 +55,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:text="Can I drink coffee"
-            android:onClick="onClickupload"
+            android:text="Can I grab a cup of coffee?"
+            android:onClick="TestVirtualCoffee"
             android:id="@+id/button_coffee_virtual" />
 
         <Button
@@ -64,49 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:text="Physical activity event"
-            android:onClick="onClickupload"
+            android:text="Physical activity movement"
+            android:onClick="onPhysicalMovement"
             android:id="@+id/button_activity" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="10dp"
-            android:text="Data receive 1"
-            android:onClick="onClickdownload"
-            android:id="@+id/button_receive" />
-
-        <Button
-            android:id="@+id/button_notification"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal"
-            android:text="Notification"
-            android:onClick="onClickNotification"/>
-
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_height="wrap_content"
-            tools:context="com.stamina.staminapp.MainActivity"
-            android:id="@+id/layout_1.1">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Drink a coffee "
-                android:id="@+id/text_constant_nextclock" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/text_constant_nextclock"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="at HH:MM AM"
-                android:id="@+id/text_nextclock" />
-        </RelativeLayout>
     </LinearLayout>

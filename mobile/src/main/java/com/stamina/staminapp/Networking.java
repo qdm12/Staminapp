@@ -1,6 +1,6 @@
 package com.stamina.staminapp;
 
-import android.util.Log;
+import android.content.Context;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -13,11 +13,12 @@ import java.util.Map;
 
 public class Networking {
     private String server_url;
-    //private CookieManager cookieManager = new CookieManager();
-    private String g_cookie = new String();
+    private String g_cookie;
+    private Utilities uti;
 
-    public Networking(String ip){
+    public Networking(Context context, String ip){
         set_url(ip);
+        this.uti = new Utilities(context);
     }
 
     public void set_url(String ip){
@@ -35,21 +36,21 @@ public class Networking {
     public void set_cookie(String cookie){ this.g_cookie = cookie;}
 
     private boolean string_ok(String var){
-        if (var != null && var.length() > 0){
+        if ((var != null) && (var.length() > 0)){
             return true;
         }
         return false;
     }
 
     private String map2url(Map<String,String> map_parameters){
-        String urlparameters = "";
+        String url_parameters_string = "";
         for (Map.Entry<String,String> entry : map_parameters.entrySet()){
-            urlparameters += entry.getKey()+"="+(String)entry.getValue()+"&";
+            url_parameters_string += entry.getKey()+"="+(String)entry.getValue()+"&";
         }
-        if (!urlparameters.equals("")) {
-            urlparameters = urlparameters.substring(0,urlparameters.length()-1);
+        if (!url_parameters_string.equals("")) {
+            url_parameters_string = url_parameters_string.substring(0,url_parameters_string.length()-1);
         }
-        return urlparameters;
+        return url_parameters_string;
     }
 
     public String post(String page, Map<String,String> map_parameters)
@@ -59,7 +60,7 @@ public class Networking {
         HttpURLConnection connection = null;
         try {
             //Creates connection
-            Log.d("com.stamina.staminapp"," -> "+urlParameters);
+            uti.log_it(" <- "+urlParameters);
             URL url = new URL(targetURL);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -68,7 +69,6 @@ public class Networking {
                 connection.setRequestProperty("Cookie", this.g_cookie);
             }
             connection.setConnectTimeout(300); //XXX Maybe to low...
-            //connection.setUseCaches (false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
@@ -95,13 +95,22 @@ public class Networking {
             }
             String response_str = response.toString();
             response_str = response_str.substring(0,response_str.length()-1);
-            Log.d("com.stamina.staminapp"," <- "+response_str+" (size "+Integer.toString(response_str.length())+")");
+            uti.log_it(" <- "+response_str);
+            if (response_str.equals("false")){
+                uti.toast_it("Upload failed", 500);
+                uti.log_it("Upload to server failed (bad login or something...)");
+                //XXX eventually retry? logout?
+                return null;
+            }
             return response_str;
         } catch (SocketTimeoutException e){
-            Log.e("com.stamina.staminapp","Connection with the server could not be established");
+            uti.toast_it("Server can't be reached (timeout)", 400);
+            uti.log_it("Networking: Server can't be reached (timeout)");
             return null;
         } catch (Exception e) {
             e.printStackTrace();
+            uti.toast_it("Network error", 400);
+            uti.log_it("Networking: Exception from HTTP post");
             return null;
         } finally {
             if(connection != null) {

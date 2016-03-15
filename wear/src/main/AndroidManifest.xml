@@ -11,26 +11,20 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
         <activity
-            android:name=".MyStubBroadcastActivity"
-            android:label="MyStubBroadcastActivity">
+            android:name=".MainActivityWear"
+            android:label="@string/app_name"
+            android:noHistory="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MyDisplayActivity"
-            android:allowEmbedded="true"
-            android:exported="true"
-            android:taskAffinity=""
-            android:theme="@android:style/Theme.DeviceDefault.Light"></activity>
-
-        <receiver
-            android:name=".MyPostNotificationReceiver"
-            android:exported="true">
+        <receiver android:name=".ListenerLaunch" >
             <intent-filter>
-                <action android:name="com.stamina.staminapp.SHOW_NOTIFICATION" />
+                <action android:name="com.stamina.staminapp.wear" />
+                <action android:name="com.stamina.staminapp.wear2" >
+                    </action>
             </intent-filter>
         </receiver>
     </application>

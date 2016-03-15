@@ -4,16 +4,13 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Utilities {
     Context context;
     String TAG = "com.stamina.staminapp";
     int i = 0;
 
     public Utilities(Context ApplicationContext){
-        context = ApplicationContext;
+        this.context = ApplicationContext;
     }
 
     public void debug_log(){
@@ -29,7 +26,9 @@ public class Utilities {
     }
 
     public void toast_it(String text, int milliduration){
-        Toast.makeText(context, text, milliduration).show();
+        if (context != null) {
+            Toast.makeText(context, text, milliduration).show();
+        }
     }
 
 }

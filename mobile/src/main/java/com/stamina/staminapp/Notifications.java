@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
@@ -46,9 +47,8 @@ public class Notifications {
         while (this.active_notifications.contains(id)) {
             id++;
         }
-        Context app_context = this.context.getApplicationContext();
-
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context);
+        Context app_context = this.context.getApplicationContext();
         mBuilder.setSmallIcon(drawable_id_small);
         if (drawable_id_large != -1) {
             Bitmap bm = BitmapFactory.decodeResource(this.context.getResources(), drawable_id_large);
@@ -60,23 +60,28 @@ public class Notifications {
         mBuilder.setContentTitle("Staminapp");
         mBuilder.setContentText(message);
 
-        Intent onClickIntent = new Intent(app_context, MainActivity.class);
-        onClickIntent.putExtra("source", "notification");
-        onClickIntent.putExtra("id", id);
+        Intent intent = new Intent(app_context, MainActivity.class);
+        intent.setAction("notification");
+        intent.putExtra("id", id);
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(app_context);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(onClickIntent);
-
-        PendingIntent pendingOnClickIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setContentIntent(pendingOnClickIntent);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pendingIntent);
 
         Notification this_notif = mBuilder.build();
         this_notif.defaults |= Notification.DEFAULT_VIBRATE;
         this_notif.defaults |= Notification.DEFAULT_SOUND;
+        this_notif.flags |= Notification.FLAG_AUTO_CANCEL;
         this.mNotificationManager.notify(id, this_notif);
         this.active_notifications.add(id);
+        Handler handler = new Handler();
+        final int notif_id = id;
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                NotificationManager nMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                nMgr.cancel(notif_id);
+            }
+        }, 10000 * 60);
     }
 
 
@@ -86,7 +91,6 @@ public class Notifications {
         while (this.active_notifications.contains(id)) {
             id++;
         }
-        Context app_context = this.context.getApplicationContext();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context);
         mBuilder.setSmallIcon(R.drawable.notif_coffee);
         mBuilder.setPriority(2);

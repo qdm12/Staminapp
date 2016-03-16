@@ -14,6 +14,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -27,23 +31,32 @@ public class Localisation {
     private Utilities uti;
     private Networking net;
     private Notifications notif;
+    public static boolean sleeping = false; //updated when waking up event
+    private static GoogleMap map;
 
 
 
-    Localisation(Context context){
+
+    Localisation(Context context, GoogleMap gmap){
         this.context = context;
-        uti = new Utilities(context);
-        notif = new Notifications(this.context);
+        this.uti = new Utilities(context);
+        this.notif = new Notifications(this.context);
+        map = gmap;
         locListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location){
                 boolean check_virtual_coffee = false;
-                double x = location.getLatitude(), y = location.getLongitude();
-                uti.log_it("GPS: Coordinates X = " + Double.toString(x)+", Y = "+Double.toString(y));
+                double xD = location.getLatitude(), yD = location.getLongitude();
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(xD, yD), 14));
+                int x = (int) (xD*1000000), y = (int) (yD*1000000);
+                uti.log_it("GPS: Coordinates X = " + Integer.toString(x)+", Y = "+ Integer.toString(y));
+                if (Localisation.sleeping){
+                    return;
+                }
                 for (Area area : coffee_areas){
                     if (area.isInArea(x, y)) {
                         long t_now = System.currentTimeMillis() / 1000;
-                        if ((area.equals(current_area)) && (t_now > area.getTimein() + 10800)) {
+                        if ((area.equals(current_area)) && (t_now > area.getTimein() + 3*60*60)) {
                             //if 3 hours have elapsed since you entered the area and you are still here.
                             check_virtual_coffee = true;
                         } else if (!area.equals(current_area)) {
@@ -53,12 +66,11 @@ public class Localisation {
                         }
                     }
                     if (check_virtual_coffee){
-                        String page = "select";
                         Map<String, String> urlparameters = new HashMap<String,String>();
                         urlparameters.put("req", "coffee_virtual");
-                        String response = net.post(page, urlparameters);
+                        String response = net.post("select", urlparameters);
                         if (response != null){
-                            String result = "Uninitialized";
+                            String result = "Network error";
                             if (response.equals("yes")) {
                                 result = "Have a cup of coffee!";
                                 if (area.isPersonal()) {
@@ -69,6 +81,7 @@ public class Localisation {
                                 }
                             } else if (response.equals("no")){
                                 result = "Don't drink any coffee, your sleep is in danger!";
+                                Localisation.sleeping = true;
                             } else if (response.equals("last")){
                                 result = "Enjoy your last cup of coffee today. ";
                                 if (area.isPersonal()) {
@@ -77,6 +90,7 @@ public class Localisation {
                                     result += "The nearest coffee shop is "+area.getName();
                                     //Find closest shop on google maps XXX
                                 }
+                                Localisation.sleeping = true;
                             }
                             notif.makeNotification(result,
                                     R.drawable.notif_coffee, R.drawable.notif_staminapp);
@@ -128,7 +142,7 @@ public class Localisation {
                     "Location access is required to indicate you where and when you could drink a coffee.",
                     Snackbar.LENGTH_INDEFINITE).setAction("OK", permission_ok).show();
         } else{ //Permissions were already granted
-            launch(3000,1); //each 3 seconds or each 3 meters
+            launch(3000,3); //each 3 seconds or each 3 meters
         }
     }
 
@@ -143,23 +157,9 @@ public class Localisation {
         uti.log_it("GPS: Location Updates started.");
     }
 
-    public void add_coffee_area(Area new_area){
-        coffee_areas.add(new_area);
+    public void add_coffee_area(double x, double y, String name, boolean personal){
+        coffee_areas.add(new Area(x,y,name,personal));
     }
-
-    public void set_default_coffee_areas(){
-        coffee_areas.add(new Area(51.485997, -0.172544, "Home", true));
-        coffee_areas.add(new Area(51.493782, -0.174287, "Starbucks (South Kensington)", false));
-        coffee_areas.add(new Area(51.499131, -0.176300, "Imperial College EEE cafe", true));
-    }
-
-
-
-
-
-
-
-
 
     public class Area {
         private int r2 = 655*655; //30 meters radius or 0.000655 in longitude/latitude of difference
@@ -191,7 +191,7 @@ public class Localisation {
             return this.time_in;
         }
 
-        public Boolean isInArea(double x, double y) {
+        public Boolean isInArea(int x, int y) {
             if ((x - this.x0) * (x - this.x0) + (y - this.y0) * (y - this.y0) <= this.r2) {
                 return true;
             }

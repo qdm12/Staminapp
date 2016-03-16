@@ -22,13 +22,12 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
     private UserLoginTask mAuthTask = null; // Keep track of the login task to ensure we can cancel it if requested.
-
+    private final String URL_STAMINA = "http://projectstamina-scutis.rhcloud.com";
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private EditText mIpView;
     private View mProgressView;
     private View mLoginFormView;
-    private boolean DEBUG = true;
+    private boolean DEBUG = false;
 
 
 
@@ -40,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
-        mIpView = (EditText) findViewById(R.id.ip);
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -62,11 +60,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean isEmailValid(String email) {
-        return true;//email.contains("@");
+        if (DEBUG){
+            return true;
+        }
+        return true; //email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        return true;//password.length() > 4;
+        if (DEBUG){
+            return true;
+        }
+        return true; //password.length() > 4;
     }
 
     private boolean isIpValid(String ip){
@@ -106,7 +110,6 @@ public class LoginActivity extends AppCompatActivity {
         mPasswordView.setError(null);
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        String ip = mIpView.getText().toString();
         View focusView = null;
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError("This field can't be empty");
@@ -116,10 +119,6 @@ public class LoginActivity extends AppCompatActivity {
             mPasswordView.setError("This field can't be empty");
             focusView = mPasswordView;
         }
-        else if  (TextUtils.isEmpty(ip)) {
-            mIpView.setError("This field can't be empty");
-            focusView = mIpView;
-        }
         else if (!isEmailValid(email)) {
             mEmailView.setError("The format of the email address is incorrect");
             focusView = mEmailView;
@@ -128,17 +127,13 @@ public class LoginActivity extends AppCompatActivity {
             mPasswordView.setError("This password is too short");
             focusView = mPasswordView;
         }
-        else if (!isIpValid(ip)){
-            mIpView.setError("The format of the IP address is incorrect");
-            focusView = mIpView;
-        }
         if(focusView != null){
             focusView.requestFocus();
             return;
         }
         // Show a progress spinner, and kick off a background task to perform the user login attempt.
         showProgress(true);
-        mAuthTask = new UserLoginTask(email, password, ip);
+        mAuthTask = new UserLoginTask(email, password);
         mAuthTask.execute((Void) null);
     }
 
@@ -168,12 +163,12 @@ public class LoginActivity extends AppCompatActivity {
     public class UserLoginTask extends AsyncTask<Void, Void, String> {
         private final String mEmail;
         private final String mPassword;
-        private Networking net = new Networking(null, "192.168.1.1");
+        private Networking net = new Networking(null, null);
 
-        UserLoginTask(String email, String password, String ip) { //constructor
+        UserLoginTask(String email, String password) { //constructor
             mEmail = email;
             mPassword = password;
-            net.set_url(ip);
+            net.set_url(URL_STAMINA);
         }
 
         @Override
@@ -202,8 +197,10 @@ public class LoginActivity extends AppCompatActivity {
             if (result.equals("auth_success")) {
                 String cookie = net.get_cookie();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.setAction("login");
                 intent.putExtra("cookie", cookie);
-                intent.putExtra("source", "LoginActivity");
+                intent.putExtra("username", mEmail);
+                intent.putExtra("url", net.get_url());
                 startActivity(intent);
             } else if (result.equals("auth_fail")) {
                 mPasswordView.setError("Wrong email/password combination");

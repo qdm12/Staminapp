@@ -12,21 +12,21 @@ import java.net.URL;
 import java.util.Map;
 
 public class Networking {
-    private String server_url;
-    private String g_cookie;
+    public static String server_url;
+    public static String g_cookie;
     private Utilities uti;
 
-    public Networking(Context context, String ip){
-        set_url(ip);
+    public Networking(Context context, String url){
+        this.server_url = url;
         this.uti = new Utilities(context);
     }
 
-    public void set_url(String ip){
-        this.server_url = build_url(ip);
+    public void set_url(String url){
+        this.server_url = url;
     }
 
-    private String build_url(String ip){
-        return "http://"+ip+":3000";
+    public String get_url(){
+        return this.server_url;
     }
 
     public String get_cookie(){
@@ -60,7 +60,7 @@ public class Networking {
         HttpURLConnection connection = null;
         try {
             //Creates connection
-            uti.log_it(" <- "+urlParameters);
+            uti.log_it(" -> "+urlParameters);
             URL url = new URL(targetURL);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.ImageView;
 
 import java.lang.reflect.Method;
 import java.util.Calendar;
@@ -14,12 +15,13 @@ public class NotifReceiver extends BroadcastReceiver {
     public static Networking net;
     public static Utilities uti;
     public static Notifications notif;
-    public int activity_coffee_state; //green, orange, red
+    public static ImageView imageView;
 
-    public void set_objects(Networking net, Notifications notif, Utilities uti){
+    public void set_objects(Networking net, Notifications notif, Utilities uti, ImageView imageView){
         this.net = net;
         this.uti = uti;
         this.notif = notif;
+        this.imageView = imageView;
     }
 
     @Override
@@ -53,10 +55,8 @@ public class NotifReceiver extends BroadcastReceiver {
         if (response != null){
             if (response.equals("yes")) {
                 this.uti.toast_it("Last coffee drunk !", 700);
-                //XXX Turn main in red
             } else if (response.equals("no")) {
                 this.uti.toast_it("Not the last coffee drunk !", 500);
-                //XXX Keep main in green
             } else {
                 this.uti.toast_it("Bad response", 800);
                 this.uti.log_it("onDrinkingCoffee: Response "+response+" is malformed. It should be yes or no.");

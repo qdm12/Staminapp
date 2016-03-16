@@ -8,25 +8,22 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:noHistory="true"
+        android:persistent="true"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
         <activity
             android:name=".MainActivityWear"
+            android:exported="true"
             android:label="@string/app_name"
-            android:noHistory="true"
-            android:exported="true">
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".ListenerLaunch" >
-            <intent-filter>
-                <action android:name="com.stamina.staminapp.wear" />
-                <action android:name="com.stamina.staminapp.wear2" >
-                    </action>
-            </intent-filter>
-        </receiver>
+
     </application>
 
 </manifest>

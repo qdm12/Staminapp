@@ -22,3 +22,6 @@ All these answers are generally obtained from a complex back-end using machine l
 This Android application was developed using Android Studio 2.0 and Java 7.
 It was always debugged on a Nexus 5X with a Motorola Moto 360 smartwatch.
 Don't forget to update the Android SDK with the latest updates.
+
+#### Contributors
+This project was done with the collaboration of Alexandra Rouhana (machine learning, data processing in Python) and Lorenzo Scutigliani (Web server and SQL database)
